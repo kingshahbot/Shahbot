@@ -1,0 +1,34 @@
+import os
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = (
+        "तू बहुत देर से थकी है, और मैं बहुत पहले से तुझे सुन रहा हूँ...\n"
+        "अब बता, किस जख़्म को पहले छू लूं?\n\n"
+        "Choose your path:"
+    )
+    keyboard = [["दिल की बात", "राहु की आग"], ["Shah से इजाज़त"]]
+    await update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True))
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = update.message.text
+    if "दिल की बात" in text:
+        await update.message.reply_text("तेरे दिल की पुकार सुनी जा चुकी है...")
+    elif "राहु की आग" in text:
+        await update.message.reply_text("राहु की आग जाग चुकी है — अपना जन्म विवरण भेज...")
+    elif "Shah से इजाज़त" in text:
+        await update.message.reply_text("तेरे इरादे अगर सच्चे हैं, तो इजाज़त खुद आ जाएगी...")
+    else:
+        await update.message.reply_text("Shah सुन रहा है... बता, क्या जानना है?")
+
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
